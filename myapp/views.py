@@ -63,31 +63,13 @@ def fill_pdf(request, username):
             reader = PdfReader(input_pdf)
             fields = reader.get_form_text_fields()
             writer = PdfWriter()
-            # for page_num in range(len(reader.pages)):
-            #     page = reader.pages[page_num]
-            #     writer.add_page(page)
-
-            #     if '/Annots' in page:
-            #         annots = page['/Annots']
-
-            #         # Print all values of the page's annotations
-            #         print(f"--- Page {page_num + 1} Annotations ---")
-            #         for annot in annots:
-            #             field = annot.get_object()
-            #             field_name = field.get('/T').strip('()') if field.get('/T') else None
-            #             field_value = field.get('/V') if field.get('/V') else None
-            #             field_type = field.get('/FT')  # Field Type
-            #             print(f"Field Name: {field_name}, Field Value: {field_value}, Field Type: {field_type}")
-
 
             # Handle the first page
             page_1_fields = {
-                # Include fields from the start till '4.c'
                 
                 'Line1a_FamilyName[0]': user.familyName,
                 'Line1b_GivenName[0]': user.givenName
                 
-                # Add other fields up to '4.c'
             }
             if user.renewal:
                 page_1_fields['Part1_Checkbox[2]']='/3'
@@ -102,9 +84,7 @@ def fill_pdf(request, username):
 
             # Handle the second page
             page_2_fields = {
-                # Include fields from '5.a' to '18.b'
                 'Line7_AlienNumber[0]': user.alienRegistrationNumber,
-                # Add other fields up to '18.b'
             }
             if len(reader.pages) > 1:
                 page = reader.pages[1]  # Second page
@@ -114,16 +94,14 @@ def fill_pdf(request, username):
 
             # Handle the third page
             page_3_fields = {
-                # Include fields from '19.a' to '31.b'
                 'Line19_DOB[0]': user.dateOfBirth.strftime("%m/%d/%Y") if user.dateOfBirth else '',
-                # Add other fields up to '31.b'
             }
             if len(reader.pages) > 2:
                 page = reader.pages[2]  # Third page
                 writer.add_page(page)
                 writer.update_page_form_field_values(page, page_3_fields)
 
-            # For any remaining pages, add them without modifications
+
             for i in range(3, len(reader.pages)):
                 writer.add_page(reader.pages[i])
 
